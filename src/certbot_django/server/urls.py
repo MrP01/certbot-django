@@ -1,4 +1,4 @@
-from django.conf.urls import include, url
+from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
 from . import views
@@ -8,6 +8,6 @@ router.register(r"challenges", views.AcmeChallengeViewSet)
 
 
 urlpatterns = [
-    url(r"^acme-challenge/(?P<acme_data>.+)$", views.detail, name="acmechallenge-response"),
-    url(r"^", include(router.urls)),
+    path(r"acme-challenge/<acme_data>", views.detail, name="acmechallenge-response"),
+    path(r"", include(router.urls)),
 ]
