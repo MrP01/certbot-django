@@ -45,7 +45,7 @@ def read(fname):
 cache_git_tag()
 
 setup(
-    name="certbot-django",
+    name="certbot-django4",
     description="Full-stack Django / LetsEncrypt / Certbot Integration",
     version=get_version(pypi=True),
     long_description=open("README.rst").read(),
@@ -60,6 +60,8 @@ setup(
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Security",
         "Topic :: System :: Installation/Setup",
@@ -69,7 +71,7 @@ setup(
     ],
     author="Craig Weber",
     author_email="crgwbr@gmail.com",
-    url="https://gitlab.com/thelabnyc/certbot-django",
+    url="https://github.com/MrP01/certbot-django",
     license="ISC",
     package_dir={"": "src"},
     packages=packages,
