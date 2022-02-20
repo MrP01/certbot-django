@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from rest_framework.reverse import reverse
+
 from .models import AcmeChallenge
 
 
@@ -8,7 +9,7 @@ class AcmeChallengeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AcmeChallenge
-        fields = ('challenge', 'response', 'acme_url')
+        fields = ("challenge", "response", "acme_url")
 
     def get_acme_url(self, obj):
-        return reverse(viewname='acmechallenge-response', args=(obj.challenge, ), request=self.context['request'])
+        return reverse(viewname="acmechallenge-response", args=(obj.challenge,), request=self.context["request"])

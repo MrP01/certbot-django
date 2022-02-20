@@ -3,9 +3,4 @@ from django.contrib import admin
 
 import certbot_django.server.urls
 
-
-urlpatterns = [
-    url(r'^admin/', admin.site.urls),
-
-    url(r'^\.well-known/', include(certbot_django.server.urls))
-]
+urlpatterns = [url(r"^admin/", admin.site.urls), url(r"^\.well-known/", include(certbot_django.server.urls))]

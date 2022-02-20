@@ -9,20 +9,19 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='AcmeChallenge',
+            name="AcmeChallenge",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('challenge', models.CharField(help_text='The identifier for this challenge', max_length=255, unique=True)),
-                ('response', models.CharField(help_text='The response expected for this challenge', max_length=255)),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("challenge", models.CharField(help_text="The identifier for this challenge", max_length=255, unique=True)),
+                ("response", models.CharField(help_text="The response expected for this challenge", max_length=255)),
             ],
             options={
-                'verbose_name': 'ACME Challenge',
-                'verbose_name_plural': 'ACME Challenges',
+                "verbose_name": "ACME Challenge",
+                "verbose_name_plural": "ACME Challenges",
             },
         ),
     ]
