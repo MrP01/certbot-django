@@ -6,7 +6,7 @@ import requests
 import zope.component
 import zope.interface
 from acme import challenges
-from asymmetric_jwt_auth import create_auth_header, generate_key_pair
+from asymmetric_jwt_auth import tokens, keys
 from certbot import errors, interfaces
 from certbot.display import util as display_util
 from certbot.plugins import common
@@ -144,7 +144,8 @@ class Authenticator(common.Plugin):
 
     def _get_headers(self, domain):
         private_key = self._get_private_key(domain)
-        headers = {"Authorization": create_auth_header(username=self._get_username(), key=private_key)}
+        token = tokens.Token(self._get_username())
+        headers = {"Authorization": token.create_auth_header(private_key)}
         return headers
 
     def _get_private_key(self, domain):
@@ -160,7 +161,8 @@ class Authenticator(common.Plugin):
                 raise errors.PluginError("Could not read file from %s" % self._get_key_dir())
 
         if not private_key:
-            private_key, public_key = generate_key_pair()
+            private_key = keys.RSAPrivateKey.generate()
+            public_key = private_key.public_key
             try:
                 logger.info("Trying to load private key: %s" % private_key_file)
                 with open(private_key_file, "w") as keyfile:
