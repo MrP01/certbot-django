@@ -1,6 +1,7 @@
 import logging
 import os
 import os.path
+from django.conf import settings
 
 import requests
 import zope.component
@@ -12,6 +13,8 @@ from certbot.display import util as display_util
 from certbot.plugins import common
 
 logger = logging.getLogger(__name__)
+logger.debug("We are now configuring django settings (sadly), because the asymmetric_jwt_auth library depends on them.")
+settings.configure()
 
 
 def _test_key_dir_read_write(key_dir):
@@ -50,8 +53,9 @@ def _validate_username(username):
     return username
 
 
-@zope.interface.implementer(interfaces.Authenticator)
-@zope.interface.provider(interfaces.Plugin)
+# TODO: migrate away from IAuthenticator, IPluginFactory, but not sure how...
+@zope.interface.implementer(interfaces.IAuthenticator)
+@zope.interface.provider(interfaces.IPluginFactory)
 class Authenticator(common.Plugin):
     """Django authenticator
 
@@ -152,21 +156,18 @@ class Authenticator(common.Plugin):
         filename = "certbot_django_id_rsa_{}".format(domain).replace(".", "")
         private_key_file = os.path.join(self._get_key_dir(), filename)
         private_key = None
-
         try:
-            with open(private_key_file, "r") as keyfile:
-                private_key = keyfile.read()
+            private_key = keys.RSAPrivateKey.load_pem_from_file(private_key_file)
         except (IOError, OSError):
             if self.config.noninteractive_mode:
                 raise errors.PluginError("Could not read file from %s" % self._get_key_dir())
-
         if not private_key:
             private_key = keys.RSAPrivateKey.generate()
             public_key = private_key.public_key
             try:
                 logger.info("Trying to load private key: %s" % private_key_file)
-                with open(private_key_file, "w") as keyfile:
-                    keyfile.write(private_key)
+                with open(private_key_file, "wb") as keyfile:
+                    keyfile.write(private_key.as_pem())
             except (IOError, OSError):
                 raise errors.PluginError("Could not write private key to %s" % self._get_key_dir())
             msg = (
@@ -185,7 +186,6 @@ class Authenticator(common.Plugin):
             )
             display = zope.component.getUtility(interfaces.IDisplay)
             display.notification(msg, wrap=False, force_interactive=True)
-
         return private_key
 
     def _get_username(self):
