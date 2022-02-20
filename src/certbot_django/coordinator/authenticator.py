@@ -6,7 +6,7 @@ import requests
 import zope.component
 import zope.interface
 from acme import challenges
-from asymmetric_jwt_auth import tokens, keys
+from asymmetric_jwt_auth import keys, tokens
 from certbot import errors, interfaces
 from certbot.display import util as display_util
 from certbot.plugins import common
@@ -50,8 +50,8 @@ def _validate_username(username):
     return username
 
 
-@zope.interface.implementer(interfaces.IAuthenticator)
-@zope.interface.provider(interfaces.IPluginFactory)
+@zope.interface.implementer(interfaces.Authenticator)
+@zope.interface.provider(interfaces.Plugin)
 class Authenticator(common.Plugin):
     """Django authenticator
 
