@@ -128,13 +128,14 @@ class Authenticator(common.Plugin):
             "challenge": challenge,
             "response": response,
         }
+        logger.info("Attempting to add ACMEChallenge to server: %s" % challenge)
+        logger.info(f"Sending {headers}, {data} to {url}")
+        resp = requests.post(url, headers=headers, data=data)
         try:
-            logger.info("Attempting to add ACMEChallenge to server: %s" % challenge)
-            resp = requests.post(url, headers=headers, data=data)
             resp.raise_for_status()
-            logger.info("Successfully added ACMEChallenge to server: %s" % challenge)
         except requests.RequestException as e:
-            raise errors.PluginError("Encountered error when adding challenge to Django server: {}".format(e))
+            raise errors.PluginError("Encountered error when adding challenge to Django server: {}, {}".format(e, resp.content))
+        logger.info("Successfully added ACMEChallenge to server: %s" % challenge)
 
     def _remove_challenge_from_server(self, domain, challenge):
         url = "http://{}/.well-known/challenges/{}/".format(domain, challenge)
