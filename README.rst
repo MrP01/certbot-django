@@ -8,6 +8,11 @@ This is a fork of the combined plugin for the certbot ACME client and also a Dja
 
 This updated version aims to provide support for django 4 and onwards as well.
 
+When creating the "certbot" user that adds the ACME challenges on the server,
+note that you must explicitly add the ACMEChallenge permissions in the django admin.
+The user "certbot" also needs to be staff.
+Just having him as an admin is not enough.
+
 **Original package Documentation**: https://certbot-django.readthedocs.io
 
 

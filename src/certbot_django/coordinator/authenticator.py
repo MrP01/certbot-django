@@ -122,30 +122,34 @@ class Authenticator(common.Plugin):
         self._add_challenge_to_server(domain, challenge, response)
 
     def _add_challenge_to_server(self, domain, challenge, response):
-        url = "http://{}/.well-known/challenges/".format(domain)
-        headers = self._get_headers(domain)
-        data = {
-            "challenge": challenge,
-            "response": response,
-        }
-        logger.info("Attempting to add ACMEChallenge to server: %s" % challenge)
-        logger.info(f"Sending {headers}, {data} to {url}")
-        resp = requests.post(url, headers=headers, data=data)
-        try:
-            resp.raise_for_status()
-        except requests.RequestException as e:
-            raise errors.PluginError("Encountered error when adding challenge to Django server: {}, {}".format(e, resp.content))
-        logger.info("Successfully added ACMEChallenge to server: %s" % challenge)
+        for protocol in ("https", "http"):
+            url = "{}://{}/.well-known/challenges/".format(protocol, domain)
+            headers = self._get_headers(domain)
+            data = {
+                "challenge": challenge,
+                "response": response,
+            }
+            logger.info("Attempting to add ACMEChallenge to server: %s" % challenge)
+            logger.info(f"Sending {headers}, {data} to {url}")
+            resp = requests.post(url, headers=headers, data=data)
+            try:
+                resp.raise_for_status()
+            except requests.RequestException as e:
+                raise errors.PluginError("Encountered error when adding challenge to Django server: {}, {}".format(e, resp.content))
+            logger.info("Successfully added ACMEChallenge to server: %s" % challenge)
+            break
 
     def _remove_challenge_from_server(self, domain, challenge):
-        url = "http://{}/.well-known/challenges/{}/".format(domain, challenge)
-        headers = self._get_headers(domain)
-        try:
+        for protocol in ("https", "http"):
+            url = "{}://{}/.well-known/challenges/{}/".format(protocol, domain, challenge)
+            headers = self._get_headers(domain)
             logger.info("Attempting to remove ACMEChallenge from server: %s" % challenge)
-            requests.delete(url, headers=headers)
+            try:
+                requests.delete(url, headers=headers)
+            except requests.RequestException:
+                logger.warning("Encountered error while removing ACMEChallenge from server: %s" % challenge)
             logger.info("Successfully removed ACMEChallenge from server: %s" % challenge)
-        except requests.RequestException:
-            logger.warning("Encountered error while removing ACMEChallenge from server: %s" % challenge)
+            break
 
     def _get_headers(self, domain):
         private_key = self._get_private_key(domain)
